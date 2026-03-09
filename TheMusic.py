@@ -342,49 +342,38 @@ def theoretical_display(desired_scale,scale_notes,scale_name,form,scale_chords,c
         for number,cadence_form in pattern.items():
             print(f'{number} : {cadence_form}')
 
+#this function simplifies chords and notes by enharmonics rule and is used in "simplifier"
+def enharmonics_simplifier(container):
+    pattern=re.compile(r'([A-Z]{1})([b*#*]*)(_*[a-z]*)')
+    sharp_notation=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+    flat_notation=["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"]
+    simplified=[]
+    for chord in container:
+                pure_note,signatures,quality=list(pattern.match(chord).groups())
+                if signatures: #if it's not a simple note
+                    indicator=1
+                    if "#" in signatures:
+                        notation=sharp_notation
+                    else: # there are 'b's
+                        notation=flat_notation
+                        indicator=-1 #this helps to reverse moving in flat notation
+                    leveler=notation.index(pure_note) + (indicator*len(signatures))
+                    simplified_chord=notation[leveler % len(notation)]
+                    chord=simplified_chord+quality
+                simplified.append(chord)
+    return simplified
+
 #this function simplifies chords and notes by enharmonics rule and is used in "practical_display"
-def enharmonics_simplifier(desired_scale,scale_notes,scale_chords,cadence):
+def simplifier(desired_scale,scale_notes,scale_chords,cadence):
     # "desired_scale" is a dict of tuple:number
     # "scale_notes" is a list of strings
     # "scale_chords" is a list of strings
     # "cadence" is a dict of string:dict2 (which dict2 is int:list)
-    sharp_notation=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-    flat_notation=["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"]
-    notation=[]
-    note_pattern=re.compile(r'([A-Z]{1})([b*#*]*)') # pattern for extracting pure note and signatures
-    chord_pattern=re.compile(r'([A-Z]{1})([b*#*]*)(_*[a-z]*)')
+
     #simplify 'scale_notes'
-    simplified_scale_notes=[]
-    for note in scale_notes:
-        pure_note,signatures=list(note_pattern.match(note).groups())
-        if signatures: #if it's not a simple note
-            indicator=1
-            if "#" in signatures:
-                notation=sharp_notation
-            else: # there are 'b's
-                notation=flat_notation
-                indicator=-1
-            leveler=notation.index(pure_note) + (indicator*len(signatures))
-            simplified_note=notation[leveler % len(notation)]
-            note=simplified_note
-        simplified_scale_notes.append(note)
-
+    simplified_scale_notes=enharmonics_simplifier(scale_notes)
     #simplify 'scale_chords'
-    simplified_scale_chords=[]
-    for chord in scale_chords:
-        pure_note,signatures,quality=list(chord_pattern.match(chord).groups())
-        if signatures: #if it's not a simple note
-            indicator=1
-            if "#" in signatures:
-                notation=sharp_notation
-            else: # there are 'b's
-                notation=flat_notation
-                indicator=-1
-            leveler=notation.index(pure_note) + (indicator*len(signatures))
-            simplified_chord=notation[leveler % len(notation)]
-            chord=simplified_chord+quality
-        simplified_scale_chords.append(chord)
-
+    simplified_scale_chords=enharmonics_simplifier(scale_chords)
     #simplify 'cadence_form'
     simplified_cadence={} # a dict of string(name):internal_dict(int:list)
     for name,shape in cadence.items():
@@ -392,20 +381,7 @@ def enharmonics_simplifier(desired_scale,scale_notes,scale_chords,cadence):
         internal_dict={} # a dict of int(number):list(cadence shape)
         for number,cadence_form in shape.items():
             # simplify selected cadence form
-            simplified_cadence_form=[]
-            for chord in cadence_form:
-                pure_note,signatures,quality=list(chord_pattern.match(chord).groups())
-                if signatures: #if it's not a simple note
-                    indicator=1
-                    if "#" in signatures:
-                        notation=sharp_notation
-                    else: # there are 'b's
-                        notation=flat_notation
-                        indicator=-1
-                    leveler=notation.index(pure_note) + (indicator*len(signatures))
-                    simplified_chord=notation[leveler % len(notation)]
-                    chord=simplified_chord+quality
-                simplified_cadence_form.append(chord)
+            simplified_cadence_form=enharmonics_simplifier(cadence_form)
             internal_dict[number]=simplified_cadence_form
         simplified_cadence[name]=internal_dict #the cadence dict
 
@@ -416,18 +392,19 @@ def enharmonics_simplifier(desired_scale,scale_notes,scale_chords,cadence):
     for tup_index in range(len(distances)):
         simplified_note_tup=(simplified_scale_notes[tup_index],simplified_scale_notes[(tup_index+1) % len(distances)])
         simplified_scale[simplified_note_tup]=distances[tup_index]
+    #return simplified results
     return simplified_scale,simplified_scale_notes,simplified_scale_chords,simplified_cadence
 
 #this way of display includes all simplifications in notes and chords usefull for cleaner display and more practical for instrumentalists
 def practical_display(desired_scale,scale_notes,scale_name,form,scale_chords,cadence):
     form_code={'1':'Major','2':'Natural Minor','3':'Harmonic Minor','4':'Melodic Minor','5':'Harmonic Major','6':'Melodic Major'}
     scale_form_name=form_code[form]
-    simplified_scale,simplified_scale_notes,simplified_scale_chords,simplified_cadence_form = enharmonics_simplifier(desired_scale,scale_notes,scale_chords,cadence)
-    print(f'scale:\n{simplified_scale}')
-    print(f'notes:\n{simplified_scale_notes}')
-    print(f'chords:\n{simplified_scale_chords}')
+    simplified_scale,simplified_scale_notes,simplified_scale_chords,simplified_cadence_form = simplifier(desired_scale,scale_notes,scale_chords,cadence)
+    print(f'enharmonic-simplified "{scale_name}" {scale_form_name} with distances is:\n{simplified_scale}')
+    print(f'enharmonic-simplified {scale_name} {scale_form_name} notes would be:\n{simplified_scale_notes}')
+    print(f'enharmonic-simplified scale chords would be:\n{simplified_scale_chords}')
     for name,pattern in simplified_cadence_form.items():
-        print(f'{name} for {scale_name} {scale_form_name} :')
+        print(f'enharmonic-simplified {name} for {scale_name} {scale_form_name} :')
         for number,cadence_form in pattern.items():
             print(f'{number} : {cadence_form}')
 
@@ -439,12 +416,11 @@ def interface():
     cadence=cadences(scale_name,task)
     print('***************theoretical display:***************')
     theoretical_display(scale_with_distance,scale_notes,scale_name,task,scale_chords,cadence)
-    print('***************practical display:***************')
+    print('\n***************practical display:***************')
     practical_display(scale_with_distance,scale_notes,scale_name,task,scale_chords,cadence)
     
 
 interface()
-
 #code is optimized and refactored
 #I utilized 2 way of showcasing the features...
 #one called "theoretical": it focuses for knowledge of music theory usefull for musician
@@ -459,12 +435,5 @@ interface()
 #Then, by using Kivy, create the section for PC and then, for Android.
 #There's a lot of exciting sections...
 #Hope to reach prefectly all of them.
-
-
-
-#in Practical Display it has an issue
-# "B#" in 3 task in practical display in  last cadence
-# it includes B##!
-# may I have to check enharmoics for "#"
 
 
