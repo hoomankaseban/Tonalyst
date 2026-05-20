@@ -1,6 +1,6 @@
 # Programmer: Hooman Kaseban
 # Step By Step of Goals...
-# Code a program which takes a simple (in further steps, signatured scales) Scale Name and generates Suitable notes for creating Major (all scale forms) scale. passed!
+# Cofrde a program which takes a simple (in further steps, signatured scales) Scale Name and generates Suitable notes for creating Major (all scale forms) scale. passed!
 # ...takes the scale name, then generates all complete Cadances of it.passed!
 # ...takes the scale neme, then gererates all types of Cadances of it.passed!
 # finally, I can go for mapping the scales on guitar board.
@@ -64,7 +64,7 @@ def scaler(scale,form):
     scale_sorted_notes+=Cmaj[:base_note_index+1]
     #this loop works on finding the distance between the Note (it should be palced on the 1st location of the pattern) and the next one.
     #it finds the "Standard" distance pattern 
-    #in further steps, code works on "actual" distance for desired form.
+    #in further steps, code works on "actual" distance for desired form.in%20%7C%20
     natural_note_tuples=list(natural_pattern.keys())
     desired_scale={} # this is the answer! (wanted scale)
     for note_index in range(len(scale_sorted_notes)-1):
@@ -332,7 +332,7 @@ def cadences(scale,scale_form):
 def theoretical_display(desired_scale,scale_notes,scale_name,form,scale_chords,cadence):
     form_code={'1':'Major','2':'Natural Minor','3':'Harmonic Minor','4':'Melodic Minor','5':'Harmonic Major','6':'Melodic Major'}
     scale_form_name=form_code[form]
-    print(f'"{scale_name}" {scale_form_name} with distances is:\n {desired_scale}')
+    print(f'"{scale_name}" {scale_form_name} notation is:\n {desired_scale}')
     #printing notes of the scale...
     print(f'{scale_name} {scale_form_name} notes would be:\n{scale_notes}')
     print(f'scale chords would be:\n{scale_chords}')
@@ -400,7 +400,7 @@ def practical_display(desired_scale,scale_notes,scale_name,form,scale_chords,cad
     form_code={'1':'Major','2':'Natural Minor','3':'Harmonic Minor','4':'Melodic Minor','5':'Harmonic Major','6':'Melodic Major'}
     scale_form_name=form_code[form]
     simplified_scale,simplified_scale_notes,simplified_scale_chords,simplified_cadence_form = simplifier(desired_scale,scale_notes,scale_chords,cadence)
-    print(f'enharmonic-simplified "{scale_name}" {scale_form_name} with distances is:\n{simplified_scale}')
+    print(f'enharmonic-simplified "{scale_name}" {scale_form_name} notation is:\n{simplified_scale}')
     print(f'enharmonic-simplified {scale_name} {scale_form_name} notes would be:\n{simplified_scale_notes}')
     print(f'enharmonic-simplified scale chords would be:\n{simplified_scale_chords}')
     for name,pattern in simplified_cadence_form.items():
