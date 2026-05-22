@@ -1,8 +1,12 @@
+from pathlib import Path
+
 import regex as re
 import flet as ft
 
 from .theory import cadences, scale_harmonization, scaler, simplifier
 
+
+LOGO_IMAGE_PATH=Path(__file__).resolve().parent.parent/'assets'/'logo.png'
 
 SCALE_FORM_LABELS={
     '1':'Major',
@@ -220,14 +224,7 @@ def _app_header():
         border_radius=8,
         content=ft.Row(
             controls=[
-                ft.Container(
-                    width=44,
-                    height=44,
-                    bgcolor='#F59E0B',
-                    border_radius=8,
-                    alignment=ft.Alignment(0,0),
-                    content=ft.Icon(ft.Icons.LIBRARY_MUSIC,color='#111827',size=26),
-                ),
+                _app_logo(),
                 ft.Column(
                     controls=[
                         ft.Text('Tonalyst',size=26,weight=ft.FontWeight.W_800,color='#FFFFFF'),
@@ -238,6 +235,35 @@ def _app_header():
             ],
             spacing=14,
         ),
+    )
+
+
+def _app_logo():
+    if not LOGO_IMAGE_PATH.exists():
+        return _fallback_logo()
+
+    return ft.Container(
+        width=44,
+        height=44,
+        border_radius=8,
+        clip_behavior=ft.ClipBehavior.HARD_EDGE,
+        alignment=ft.Alignment(0,0),
+        content=ft.Image(
+            src=LOGO_IMAGE_PATH.read_bytes(),
+            fit=ft.BoxFit.CONTAIN,
+            error_content=_fallback_logo(),
+        ),
+    )
+
+
+def _fallback_logo():
+    return ft.Container(
+        width=44,
+        height=44,
+        bgcolor='#F59E0B',
+        border_radius=8,
+        alignment=ft.Alignment(0,0),
+        content=ft.Icon(ft.Icons.LIBRARY_MUSIC,color='#111827',size=26),
     )
 
 
