@@ -1,0 +1,2 @@
+"""Musician package."""
+
