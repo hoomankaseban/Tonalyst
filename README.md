@@ -13,6 +13,9 @@ The app shows each result in two ways:
 
 The visible app behavior and music logic are intentionally kept the same. The code has been separated into modules so the theory engine, UI, and launcher are easier to understand and maintain.
 
+## Application First Page
+<img width="1920" height="1909" alt="app view" src="https://github.com/user-attachments/assets/73b28413-476d-41b8-98f1-c4214029bfb5" />
+
 ## Project Structure
 
 ```text
